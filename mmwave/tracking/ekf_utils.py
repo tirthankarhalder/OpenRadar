@@ -690,6 +690,7 @@ def gtrack_computeJacobian(format, cart, jac):
 
 
 def gtrack_unrollRadialVelocity(rvMax, rvExp, rvIn):
+    rvExp = rvIn
     distance = np.float32(rvExp - rvIn)
     if distance >= 0:
         factor = int((distance + rvMax) / (2 * rvMax))

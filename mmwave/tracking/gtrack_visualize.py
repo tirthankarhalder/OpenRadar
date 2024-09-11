@@ -26,16 +26,6 @@ BLUE = (255, 0, 0)
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-smiley = cv2.imread('./smiley.png')
-smiley_mask = np.zeros(smiley.shape)
-smiley_width = smiley.shape[1]
-smiley_height = smiley.shape[0]
-
-cv2.circle(smiley_mask, (smiley_width // 2, smiley_height // 2), 200, WHITE, -1)
-smiley[smiley_mask != 255] = 0
-smiley = smiley[smiley_width // 2 - 200:smiley_width // 2 + 200, smiley_width // 2 - 200:smiley_width // 2 + 200]
-smiley = cv2.resize(smiley, (radius * 2, radius * 2))
-
 
 def norm_y(y):
     """Normalized y from 0-1
@@ -202,7 +192,6 @@ def update_frame(target_desc, num_trackers, frame=None):
         x_pos, y_pos, x_vel, y_vel = t.S[:4]
         x_pos = -x_pos
         try:
-            draw_img(frame, view_x(x_pos), view_y(y_pos), smiley)
             cv2.putText(frame, f'ID:{tid}', (view_x(x_pos) - 30, view_y(y_pos) - 60), font, 1, BLACK, 2, cv2.LINE_AA)
 
             vec_mag = np.sqrt(x_vel ** 2 + y_vel ** 2)
