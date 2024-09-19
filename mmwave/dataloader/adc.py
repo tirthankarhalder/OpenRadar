@@ -42,10 +42,10 @@ class CMD(Enum):
 CONFIG_HEADER = '5aa5'
 CONFIG_STATUS = '0000'
 CONFIG_FOOTER = 'aaee'
-ADC_PARAMS = {'chirps': 128,  # 32
+ADC_PARAMS = {'chirps': 182,  # 32
               'rx': 4,
               'tx': 3,
-              'samples': 128,
+              'samples': 256,
               'IQ': 2,
               'bytes': 2}
 # STATIC
@@ -156,7 +156,7 @@ class DCA1000:
         self.data_socket.close()
         self.config_socket.close()
 
-    def read(self, timeout=1):
+    def read(self, timeout=1, num_frames=100):
         """ Read in a single packet via UDP
 
         Args:
@@ -170,16 +170,16 @@ class DCA1000:
         self.data_socket.settimeout(timeout)
 
         # Frame buffer
-        ret_frame = np.zeros(UINT16_IN_FRAME, dtype=np.uint16)
-
+        ret_frame = np.zeros((num_frames, UINT16_IN_FRAME), dtype=np.uint16)
+        packets_read = 0
         # Wait for start of next frame
         while True:
             packet_num, byte_count, packet_data = self._read_data_packet()
             if byte_count % BYTES_IN_FRAME_CLIPPED == 0:
                 packets_read = 1
-                ret_frame[0:UINT16_IN_PACKET] = packet_data
+                # ret_frame[0:UINT16_IN_PACKET] = packet_data
                 break
-
+        count_frames = 0    
         # Read in the rest of the frame            
         while True:
             packet_num, byte_count, packet_data = self._read_data_packet()
@@ -187,11 +187,13 @@ class DCA1000:
 
             if byte_count % BYTES_IN_FRAME_CLIPPED == 0:
                 self.lost_packets = PACKETS_IN_FRAME_CLIPPED - packets_read
-                return ret_frame
+                count_frames+=1
+                if count_frames == num_frames:
+                    return ret_frame
 
             curr_idx = ((packet_num - 1) % PACKETS_IN_FRAME_CLIPPED)
             try:
-                ret_frame[curr_idx * UINT16_IN_PACKET:(curr_idx + 1) * UINT16_IN_PACKET] = packet_data
+                ret_frame[count_frames, curr_idx * UINT16_IN_PACKET:(curr_idx + 1) * UINT16_IN_PACKET] = packet_data
             except:
                 pass
 
