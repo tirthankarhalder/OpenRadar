@@ -163,6 +163,7 @@ class gtrack_measurementPoint():
         self.angle = 0.
         self.doppler = 0.
         self.snr = 0.
+        self.power = 0.
 
 
 # GTRACK Measurement variances

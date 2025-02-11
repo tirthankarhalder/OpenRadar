@@ -56,7 +56,7 @@ class EKF:
         self.h_track_module = gtrack_test.create(config)
         self.num_points = None
 
-    def update_point_cloud(self, ranges, azimuths, dopplers, snrs):
+    def update_point_cloud(self, ranges, azimuths, dopplers, snrs, powers):
         """Update step of the EKF
 
         Args:
@@ -68,11 +68,12 @@ class EKF:
         Returns:
             None
         """
-        for distance, azimuth, doppler, snr, idx in zip(ranges, azimuths, dopplers, snrs, range(len(ranges))):
+        for distance, azimuth, doppler, snr, power, idx in zip(ranges, azimuths, dopplers, snrs, powers, range(len(ranges))):
             self.point_cloud[idx].range = distance
             self.point_cloud[idx].angle = azimuth
             self.point_cloud[idx].doppler = doppler
             self.point_cloud[idx].snr = snr
+            self.point_cloud[idx].power = power
         self.num_points = len(ranges)
 
     def step(self):
